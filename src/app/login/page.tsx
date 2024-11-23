@@ -1,13 +1,12 @@
-"use client";
+import { COOKIE_USER_ID, COOKIE_USER_NAME } from "@/constants";
+import Component from "./Component";
+import { getCookie } from "cookies-next/server";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
-import Header from "@/components/molecules/Header";
-import LoginComponent from "@/components/template/Login";
-
-export default function Login() {
-  return (
-    <main className="min-h-screen bg-white">
-      <Header />
-      <LoginComponent />
-    </main>
-  );
+export default async function Login() {
+  const userId = await getCookie(COOKIE_USER_ID, { cookies });
+  const userName = await getCookie(COOKIE_USER_NAME, { cookies });
+  if (userId && userName) redirect("/");
+  return <Component />;
 }

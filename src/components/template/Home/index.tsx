@@ -1,8 +1,41 @@
 interface IProps {}
 
+import { useVideos } from "@/hooks/useVideo";
 import { Upload, MoreHorizontal, Zap, Youtube } from "lucide-react";
+import Image from "next/image";
+import { useCallback, useEffect } from "react";
 
 const HomeComponent = (props: IProps) => {
+  const { fetchVideosList, loading, videos } = useVideos();
+  console.log(`🚀 ~ HomeComponent ~ videos:`, videos);
+
+  useEffect(() => {
+    fetchVideosList();
+  }, []);
+
+  const renderVideosList = useCallback(() => {
+    if (loading) return <p className="text-black">...Loading</p>;
+    return videos?.map((video) => (
+      <div key={video.id} className="rounded-lg overflow-hidden">
+        <div className="relative">
+          <div className="bg-gray-800 aspect-video relative">
+            {!!video.thumbnail && (
+              <Image src={video.thumbnail} fill alt={video.name} className="object-cover"/>
+            )}
+          </div>
+        </div>
+        <div className="mt-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-black">{video.name}</p>
+            <button className="p-1">
+              <MoreHorizontal className="w-4 h-4 text-gray-500" />
+            </button>
+          </div>
+        </div>
+      </div>
+    ));
+  }, [loading, videos]);
+
   return (
     <div className="w-full px-4 py-8">
       {/* Upload Section */}
@@ -27,61 +60,7 @@ const HomeComponent = (props: IProps) => {
       </div>
 
       {/* Video Grid */}
-      <div className="w-full grid grid-cols-2 gap-6">
-        {/* Video Card 1 */}
-        <div className="rounded-lg overflow-hidden">
-          <div className="relative">
-            <div className="bg-gray-800 aspect-video relative">
-              <div className="absolute top-2 left-2 text-white text-sm">
-                13:23
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="bg-red-500 text-white p-4 rounded">
-                  Task took too long to complete!
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="mt-2">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">
-                Nvidia CEO Jensen Huang and the $2 trillion company powering
-                today's...
-              </p>
-              <button className="p-1">
-                <MoreHorizontal className="w-4 h-4 text-gray-500" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Video Card 2 */}
-        <div className="rounded-lg overflow-hidden">
-          <div className="relative">
-            <div className="bg-gray-800 aspect-video relative">
-              <div className="absolute top-2 left-2 text-white text-sm">
-                38:36
-              </div>
-              <img
-                src="/api/placeholder/400/225"
-                alt="Arizona Trip Thumbnail"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-          <div className="mt-2">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">
-                Du lịch Mỹ tự túc #5: Dừng đến Arizona một mình! USA trip
-              </p>
-              <button className="p-1">
-                <MoreHorizontal className="w-4 h-4 text-gray-500" />
-              </button>
-            </div>
-            <p className="text-sm text-gray-500">Unable to edit</p>
-          </div>
-        </div>
-      </div>
+      <div className="w-full grid grid-cols-4 gap-6">{renderVideosList()}</div>
     </div>
   );
 };
